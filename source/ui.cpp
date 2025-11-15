@@ -1,6 +1,31 @@
 #include "../headers/ui.hpp"
 CLI* ACTIVE_CLI = nullptr;
 
+void CLI::DrawTextDevices(){
+    unsigned short int start = 1; // TO DO: based on ncursor
+    for (unsigned short int i = start; i <= this->devices.size(); i++)
+    {
+        this->device_ui->Print(this->devices[i - 1].Hostname(), static_cast<unsigned short int>(1), i);
+    }
+    start = 1;
+    for (unsigned short int i = start; i <= this->devices[this->Active[0]].GetInterfaces().size(); i++)
+    {
+        this->device_mode_ui->Print(this->devices[this->Active[0]].GetInterfaces()[i - 1].GetIdentifier(), static_cast<unsigned short int>(this->device_mode_ui->GetX() + 1), start);
+    }
+    start = 1;
+    for (auto &i : this->devices[this->Active[0]].GetInterfaces()[this->Active[1]].GetCommands())
+    {
+        std::vector<std::string> texts = i->ToString();
+        for (std::string &text : texts)
+        {
+            this->device_atributes_ui->Print(text, static_cast<unsigned short int>(this->device_atributes_ui->GetX() + 1), start);
+            start++;
+        }
+
+    }
+
+}
+
 void CLI::Resize(){
     resizeterm(LINES, COLS);
     clear();
@@ -9,16 +34,17 @@ void CLI::Resize(){
     this->MAX_X = static_cast<unsigned short int>(COLS);
     this->MAX_Y = static_cast<unsigned short int>(LINES);
 
-    this->device_ui->ReBuild(0, 0, 16, MAX_Y);
-    this->device_mode_ui->ReBuild(16 , 0, 20, MAX_Y);
-    this->device_atributes_ui->ReBuild(36 , 0, 20, MAX_Y);
+    this->device_ui->ReBuild(0, 0, 20, MAX_Y);
+    this->device_mode_ui->ReBuild(20 , 0, 36, MAX_Y);
+    this->device_atributes_ui->ReBuild(56 , 0, 60, MAX_Y);
     
     this->device_ui->Box();
     this->device_mode_ui->Box();
     this->device_atributes_ui->Box();
 
     //TO DO: TEXT PRINTING TO
-    
+    this->DrawTextDevices();
+
     this->device_ui->Refresh();
     this->device_mode_ui->Refresh();
     this->device_atributes_ui->Refresh();
@@ -36,9 +62,9 @@ CLI::CLI(/* args */)
     this->MAX_X = static_cast<unsigned short int>(COLS);
     this->MAX_Y = static_cast<unsigned short int>(LINES);
 
-    this->device_ui = new NC_WINDOW("LIST", 0, 0, 16, MAX_Y);
-    this->device_mode_ui = new NC_WINDOW("MODE", 16 , 0, 20, MAX_Y);
-    this->device_atributes_ui = new NC_WINDOW("CONFIG", 37 , 0, 20, MAX_Y);
+    this->device_ui = new NC_WINDOW("LIST", 0, 0, 20, MAX_Y);
+    this->device_mode_ui = new NC_WINDOW("MODE", 20 , 0, 36, MAX_Y);
+    this->device_atributes_ui = new NC_WINDOW("CONFIG", 56 , 0, 60, MAX_Y);
 }
 
 CLI::~CLI()
@@ -86,8 +112,12 @@ void CLI::START_RUNTIME(){
     // this->device_ui->ConsoleLog();
 
 }
+bool CLI::AddDevice(NET_DEVICE_TYPE type){
+    this->devices.push_back(NET_DEVICE(type));
+    return 1;
+}
 
-void HandleCursor(){
+void CLI::HandleCursor(){
 
 }
 

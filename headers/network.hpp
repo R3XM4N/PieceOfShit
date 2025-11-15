@@ -54,6 +54,9 @@ public:
 class INTERFACE
 {
 private:
+    static unsigned int next_id;
+    unsigned int INDENTIFIER;
+    INTERFACE_TYPE TYPE = INTERFACE_TYPE::NONE;
     std::string identifier = "INVALID INTERFACE";
     std::vector<NETCOMMAND*> config;
 public:
@@ -68,14 +71,22 @@ public:
 class NET_DEVICE
 {
 private:
+    static unsigned int next_id;
+    unsigned int INDENTIFIER;
+    const static unsigned short int MAX_HOSTNAME_LENGTH = 16;
     std::string HOSTNAME = "INVALID DEVICE";
     std::vector<INTERFACE> interfaces;
     NET_DEVICE_TYPE device_type = NET_DEVICE_TYPE::NONE;
 public:
-    void AddIP(COMMAND_TYPE ip_type, std::string interface_identifier, std::string address, unsigned int suffix);
+    std::vector<INTERFACE>& GetInterfaces();
+    std::string Hostname();
+    std::string ToString();
+    bool SetHostname(std::string new_hostname);
+    bool AddInterface(INTERFACE_TYPE interface_type);
     NET_DEVICE(NET_DEVICE_TYPE deviceType);
     ~NET_DEVICE();
-    std::string ToString();
+
+    bool AddIP(COMMAND_TYPE ip_type, std::string interface_identifier, std::string address, unsigned int suffix);
 };
 
 

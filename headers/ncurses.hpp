@@ -27,12 +27,17 @@ private:
     ncurses_window* self;
 public:
     void Draw();
-    void Print(std::string& text, unsigned short int offset_x, unsigned short int offset_y);
+    void Print(const std::string& text, unsigned short int offset_x, unsigned short int offset_y);
     void Print(std::ostringstream& text_streamed, unsigned short int offset_x, unsigned short int offset_y); //for ss cuz string builder deez nutz
     void Refresh();
     void Box(unsigned int chtype = 0, unsigned int chtype_ = 0);
     void ReBuild(unsigned short int x, unsigned short int y, unsigned short int width, unsigned short int height);
     void ConsoleLog();
+    unsigned short int GetX();
+    unsigned short int GetY();
+    unsigned short int GetWidth();
+    unsigned short int GetHeigth();
+
     NC_WINDOW(const std::string& name, unsigned short int x, unsigned short int y, unsigned short int width, unsigned short int height);
     ~NC_WINDOW();
 };

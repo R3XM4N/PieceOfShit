@@ -17,14 +17,17 @@ struct ncursor{
 class CLI
 {
 private:
+    std::vector<NET_DEVICE> devices;
     NC_WINDOW* device_ui = nullptr;
     NC_WINDOW* device_mode_ui = nullptr;
     NC_WINDOW* device_atributes_ui = nullptr;
     unsigned short int MAX_X, MAX_Y;
+    unsigned short int Active[3] = {0,0,0}; // save active elements
     ncursor cursor = {0,0}; //location
     unsigned int CURSOR_X_MAX = 1;
     unsigned int CURSOR_Y_MAX = 1;
-
+    bool AddDevice(NET_DEVICE_TYPE type);
+    void DrawTextDevices();
     void HandleCursor();
     /* data */
 public:

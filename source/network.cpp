@@ -1,13 +1,5 @@
 #include "../headers/network.hpp"
 
-std::string INTERFACE::ToString(){
-
-}
-std::string NET_DEVICE::ToString(){
-
-}
-
-
 #pragma region IP COMMAND
 IP_C::IP_C(COMMAND_TYPE cmd, std::string address, unsigned int suffix){
     this->command = cmd;
@@ -36,7 +28,8 @@ std::vector<std::string> IP_C::ToString(){
 
 
 #pragma region INTERFACE
-INTERFACE::INTERFACE(std::string interface_identifier, INTERFACE_TYPE int_type){
+unsigned int INTERFACE::next_id = 0;
+INTERFACE::INTERFACE(std::string interface_identifier, INTERFACE_TYPE int_type) : INDENTIFIER(next_id++) {
     this->identifier = interface_identifier;
 }
 
@@ -54,24 +47,39 @@ std::string INTERFACE::GetIdentifier(){
 std::vector<NETCOMMAND*>& INTERFACE::GetCommands(){
     return this->config;
 }
+std::string INTERFACE::ToString(){
+    return "INTERFACE::ToString NOT IMPLEMENTED";
+}
 #pragma endregion
 
 #pragma region NET_DEVICE
-NET_DEVICE::NET_DEVICE(NET_DEVICE_TYPE deviceType)
+unsigned int NET_DEVICE::next_id = 0;
+std::vector<INTERFACE>& NET_DEVICE::GetInterfaces(){
+    return this->interfaces;
+}
+
+bool NET_DEVICE::AddIP(COMMAND_TYPE ip_type, std::string interface_identifier, std::string address, unsigned int suffix){
+    for (INTERFACE &interface : this->interfaces){
+        if (interface.GetIdentifier() == interface_identifier){
+            interface.AddCommand(new IP_C(ip_type, address, suffix));
+            return 1;
+        }
+    }
+    return 0;
+}
+NET_DEVICE::NET_DEVICE(NET_DEVICE_TYPE deviceType) : INDENTIFIER(next_id++) 
 {
 
 }
 
 NET_DEVICE::~NET_DEVICE()
 {
-
+    
 }
-void NET_DEVICE::AddIP(COMMAND_TYPE ip_type, std::string interface_identifier, std::string address, unsigned int suffix){
-    for (INTERFACE &interface : this->interfaces){
-        if (interface.GetIdentifier() == interface_identifier)
-            interface.AddCommand(new IP_C(ip_type, address, suffix));
-    }
+std::string NET_DEVICE::ToString(){
+    return "NET_DEVICE::ToString NOT IMPLEMENTED";
 }
-
-
+std::string NET_DEVICE::Hostname(){
+    return this->HOSTNAME;
+}
 #pragma endregion

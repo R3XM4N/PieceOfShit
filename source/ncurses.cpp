@@ -38,7 +38,7 @@ void ncw_rebuild(ncurses_window& window, unsigned short int x, unsigned short in
 void NC_WINDOW::Draw(){
     ncw_refresh(*this->self);
 }
-void NC_WINDOW::Print(std::string& text, unsigned short int offset_x, unsigned short int offset_y){
+void NC_WINDOW::Print(const std::string& text, unsigned short int offset_x, unsigned short int offset_y){
     ncw_print(*this->self, text, offset_x, offset_y);
 }
 void NC_WINDOW::Print(std::ostringstream& text_streamed, unsigned short int offset_x, unsigned short int offset_y){
@@ -74,4 +74,7 @@ void NC_WINDOW::ConsoleLog(){
     << "_width: " <<  this->self->width << "\n"
     << "_height: " <<  this->self->height << "\n";
 }
-
+unsigned short int NC_WINDOW::GetX(){return this->self->x;}
+unsigned short int NC_WINDOW::GetY(){return this->self->y;}
+unsigned short int NC_WINDOW::GetWidth(){return this->self->width;}
+unsigned short int NC_WINDOW::GetHeigth(){return this->self->height;}
