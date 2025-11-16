@@ -1,5 +1,43 @@
 #include "../headers/network.hpp"
 
+/*
+NONE,
+ENABLE,
+GLOBAL_CONF,
+VLAN_CONF,
+OSPF_CONF,
+INT_GIGABYTE,
+INT_FAST
+*/
+
+std::string interfaceTypeToString(INTERFACE_TYPE int_type){
+    switch (int_type)
+    {
+    case INTERFACE_TYPE::ENABLE:
+        return "#";
+        break;
+    case INTERFACE_TYPE::GLOBAL_CONF:
+        return "(global): ";
+        break;
+    case INTERFACE_TYPE::VLAN_CONF:
+        return "(vlan): ";
+        break;
+    case INTERFACE_TYPE::OSPF_CONF:
+        return "(ospf): ";
+        break;
+    case INTERFACE_TYPE::INT_GIGABYTE:
+        return "(gi): ";
+        break;
+    case INTERFACE_TYPE::INT_FAST:
+        return "(fa): ";
+        break;
+    default:
+        return "ERROR";
+        break;
+    }
+}
+
+
 #pragma region IP COMMAND
 IP_C::IP_C(COMMAND_TYPE cmd, std::string address, unsigned int suffix){
     this->command = cmd;
@@ -29,8 +67,9 @@ std::vector<std::string> IP_C::ToString(){
 
 #pragma region INTERFACE
 unsigned int INTERFACE::next_id = 0;
-INTERFACE::INTERFACE(std::string interface_identifier, INTERFACE_TYPE int_type) : INDENTIFIER(next_id++) {
+INTERFACE::INTERFACE(INTERFACE_TYPE int_type, std::string interface_identifier) : INDENTIFIER(next_id++) {
     this->identifier = interface_identifier;
+    this->TYPE = int_type;
 }
 
 INTERFACE::~INTERFACE(){
@@ -48,7 +87,7 @@ std::vector<NETCOMMAND*>& INTERFACE::GetCommands(){
     return this->config;
 }
 std::string INTERFACE::ToString(){
-    return "INTERFACE::ToString NOT IMPLEMENTED";
+    return interfaceTypeToString(this->TYPE) + this->GetIdentifier();
 }
 #pragma endregion
 
@@ -69,7 +108,7 @@ bool NET_DEVICE::AddIP(COMMAND_TYPE ip_type, std::string interface_identifier, s
 }
 NET_DEVICE::NET_DEVICE(NET_DEVICE_TYPE deviceType) : INDENTIFIER(next_id++) 
 {
-
+    this->device_type = device_type;
 }
 
 NET_DEVICE::~NET_DEVICE()
@@ -81,5 +120,14 @@ std::string NET_DEVICE::ToString(){
 }
 std::string NET_DEVICE::Hostname(){
     return this->HOSTNAME;
+}
+bool NET_DEVICE::SetHostname(std::string new_hostname){
+    this->HOSTNAME = new_hostname;
+    return 1;
+}
+
+bool NET_DEVICE::AddInterface(INTERFACE_TYPE interface_type, std::string identifier){
+    this->interfaces.push_back(INTERFACE(interface_type, identifier));
+    return 1;
 }
 #pragma endregion

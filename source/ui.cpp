@@ -5,25 +5,31 @@ void CLI::DrawTextDevices(){
     unsigned short int start = 1; // TO DO: based on ncursor
     for (unsigned short int i = start; i <= this->devices.size(); i++)
     {
-        this->device_ui->Print(this->devices[i - 1].Hostname(), static_cast<unsigned short int>(1), i);
+        this->device_ui->Print(this->devices[i - 1].Hostname(), static_cast<unsigned short int>(2), i);
     }
     start = 1;
-    for (unsigned short int i = start; i <= this->devices[this->Active[0]].GetInterfaces().size(); i++)
+    if (this->devices.size() > 0)
     {
-        this->device_mode_ui->Print(this->devices[this->Active[0]].GetInterfaces()[i - 1].GetIdentifier(), static_cast<unsigned short int>(this->device_mode_ui->GetX() + 1), start);
-    }
-    start = 1;
-    for (auto &i : this->devices[this->Active[0]].GetInterfaces()[this->Active[1]].GetCommands())
-    {
-        std::vector<std::string> texts = i->ToString();
-        for (std::string &text : texts)
+        while (start <= this->devices[this->Active[0]].GetInterfaces().size())
         {
-            this->device_atributes_ui->Print(text, static_cast<unsigned short int>(this->device_atributes_ui->GetX() + 1), start);
+            this->device_mode_ui->Print(this->devices[this->Active[0]].GetInterfaces()[start - 1].ToString(), static_cast<unsigned short int>(2), start);
             start++;
         }
 
+        if (this->devices[this->Active[0]].GetInterfaces()[this->Active[1]].GetCommands().size())
+        {
+            start = 1;
+            for (auto &i : this->devices[this->Active[0]].GetInterfaces()[this->Active[1]].GetCommands())
+            {
+                std::vector<std::string> texts = i->ToString();
+                for (std::string &text : texts)
+                {
+                    this->device_atributes_ui->Print(text, static_cast<unsigned short int>(2), start);
+                    start++;
+                }
+            }    
+        }
     }
-
 }
 
 void CLI::Resize(){
@@ -65,6 +71,23 @@ CLI::CLI(/* args */)
     this->device_ui = new NC_WINDOW("LIST", 0, 0, 20, MAX_Y);
     this->device_mode_ui = new NC_WINDOW("MODE", 20 , 0, 36, MAX_Y);
     this->device_atributes_ui = new NC_WINDOW("CONFIG", 56 , 0, 60, MAX_Y);
+
+    this->AddDevice(NET_DEVICE_TYPE::ROUTER);
+    this->AddDevice(NET_DEVICE_TYPE::ROUTER);
+    this->devices[0].SetHostname("Smerovac smeru");
+    this->devices[1].SetHostname("Autismus");
+    this->devices[0].AddInterface(INTERFACE_TYPE::INT_FAST, "0/0");
+    this->devices[0].AddInterface(INTERFACE_TYPE::INT_FAST, "0/1");
+    this->devices[0].AddInterface(INTERFACE_TYPE::INT_FAST, "0/2");
+    this->devices[0].AddInterface(INTERFACE_TYPE::INT_FAST, "0/3");
+    this->devices[0].AddInterface(INTERFACE_TYPE::INT_FAST, "0/4");
+    this->devices[0].AddInterface(INTERFACE_TYPE::INT_GIGABYTE, "0/0");
+    this->devices[0].AddInterface(INTERFACE_TYPE::INT_GIGABYTE, "0/4");
+    this->devices[0].AddIP(COMMAND_TYPE::IPv6, "0/0", "0::0", 64);
+    this->devices[0].AddIP(COMMAND_TYPE::IPv6, "0/1", "0::0", 64);
+    this->devices[0].AddIP(COMMAND_TYPE::IPv6, "0/0", "0::0", 64);
+    this->devices[0].AddIP(COMMAND_TYPE::IPv6, "0/0", "0::0", 64);
+
 }
 
 CLI::~CLI()

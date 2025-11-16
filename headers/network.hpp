@@ -15,11 +15,13 @@ enum class INTERFACE_TYPE{
     NONE,
     ENABLE,
     GLOBAL_CONF,
-    VLAN_CONF,
+    VLAN_CONF,  
     OSPF_CONF,
     INT_GIGABYTE,
     INT_FAST
 };
+
+std::string interfaceTypeToString(INTERFACE_TYPE int_type);
 
 enum class COMMAND_TYPE{
     NONE,
@@ -60,7 +62,7 @@ private:
     std::string identifier = "INVALID INTERFACE";
     std::vector<NETCOMMAND*> config;
 public:
-    INTERFACE(std::string interface_identifier, INTERFACE_TYPE int_type);
+    INTERFACE(INTERFACE_TYPE int_type, std::string interface_identifier);
     ~INTERFACE();
     void AddCommand(NETCOMMAND* declared_command);
     std::vector<NETCOMMAND*>& GetCommands();
@@ -82,16 +84,11 @@ public:
     std::string Hostname();
     std::string ToString();
     bool SetHostname(std::string new_hostname);
-    bool AddInterface(INTERFACE_TYPE interface_type);
+    bool AddInterface(INTERFACE_TYPE interface_type, std::string identifier);
     NET_DEVICE(NET_DEVICE_TYPE deviceType);
     ~NET_DEVICE();
 
     bool AddIP(COMMAND_TYPE ip_type, std::string interface_identifier, std::string address, unsigned int suffix);
 };
-
-
-
-
-
 
 #endif
