@@ -9,10 +9,10 @@
 
 void RESIZER(int sig);
 
-struct ncursor{
-    uint x;
-    uint y;
-};
+// struct ncursor{
+//     uint x;
+//     uint y;
+// };
 
 class CLI
 {
@@ -25,8 +25,8 @@ private:
     unsigned short int ACTIVE_COLL = 0;
     unsigned short int Active[3] = {0,0,0}; // save active elements
     // ncursor cursor = {0,0}; //location
-    unsigned int CURSOR_X_MAX = 1;
-    unsigned int CURSOR_Y_MAX = 1;
+    // unsigned int CURSOR_X_MAX = 1;
+    // unsigned int CURSOR_Y_MAX = 1;
     bool AddDevice(NET_DEVICE_TYPE type);
     void DrawTextDevices();
     void ChangeActive(bool change_coll, bool increase);

@@ -45,6 +45,15 @@ void NC_WINDOW::Print(std::ostringstream& text_streamed, unsigned short int offs
     std::string text = text_streamed.str();
     this->Print(text, offset_x, offset_y);    
 }
+void NC_WINDOW::CPrint(const std::string& text, unsigned short int offset_x, unsigned short int offset_y, unsigned short int color_pair){
+    wattron(this->self->self, COLOR_PAIR(color_pair));
+    ncw_print(*this->self, text, offset_x, offset_y);
+    wattroff(this->self->self, COLOR_PAIR(color_pair));
+}
+void NC_WINDOW::CPrint(std::ostringstream& text_streamed, unsigned short int offset_x, unsigned short int offset_y, unsigned short int color_pair){
+    std::string text = text_streamed.str();
+    this->CPrint(text, offset_x, offset_y, color_pair);    
+}
 
 void NC_WINDOW::Refresh(){
     ncw_refresh(*this->self);

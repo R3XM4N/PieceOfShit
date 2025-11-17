@@ -29,6 +29,8 @@ public:
     void Draw();
     void Print(const std::string& text, unsigned short int offset_x, unsigned short int offset_y);
     void Print(std::ostringstream& text_streamed, unsigned short int offset_x, unsigned short int offset_y); //for ss cuz string builder deez nutz
+    void CPrint(const std::string& text, unsigned short int offset_x, unsigned short int offset_y, unsigned short int color_pair);
+    void CPrint(std::ostringstream& text_streamed, unsigned short int offset_x, unsigned short int offset_y, unsigned short int color_pair);
     void Refresh();
     void Box(unsigned int chtype = 0, unsigned int chtype_ = 0);
     void ReBuild(unsigned short int x, unsigned short int y, unsigned short int width, unsigned short int height);

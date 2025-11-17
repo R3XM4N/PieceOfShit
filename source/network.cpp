@@ -47,9 +47,9 @@ IP_C::IP_C(COMMAND_TYPE cmd, std::string address, unsigned int suffix){
 std::vector<std::string> IP_C::GetCommands(){
     std::stringstream output;
     if (command == COMMAND_TYPE::IPv4)
-        output << "ip " << this->address << " TODO: MASK TRANSLATION/" << this->mask_suffix; //TO DO: add (mask)
+        output << "ip address " << this->address << " TODO: MASK TRANSLATION/" << this->mask_suffix; //TO DO: add (mask)
     if (command == COMMAND_TYPE::IPv6)
-        output << "ipv6 " << this->address << " /" << this->mask_suffix;
+        output << "ipv6 address " << this->address << " /" << this->mask_suffix;
     else return {"IP COMMAND WRONGLY INITIALIZED (COMMAND)"};
     return {output.str()};
 }
