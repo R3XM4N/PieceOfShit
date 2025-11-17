@@ -1,6 +1,24 @@
 #include "../headers/ui.hpp"
 CLI* ACTIVE_CLI = nullptr;
 
+void CLI::LoadData(){
+    this->AddDevice(NET_DEVICE_TYPE::ROUTER);
+    this->AddDevice(NET_DEVICE_TYPE::ROUTER);
+    this->devices[0].SetHostname("Smerovac smeru");
+    this->devices[1].SetHostname("Autismus");
+    this->devices[0].AddInterface(INTERFACE_TYPE::INT_FAST, "0/0");
+    this->devices[0].AddInterface(INTERFACE_TYPE::INT_FAST, "0/1");
+    this->devices[0].AddInterface(INTERFACE_TYPE::INT_FAST, "0/2");
+    this->devices[0].AddInterface(INTERFACE_TYPE::INT_FAST, "0/3");
+    this->devices[0].AddInterface(INTERFACE_TYPE::INT_FAST, "0/4");
+    this->devices[0].AddInterface(INTERFACE_TYPE::INT_GIGABYTE, "0/0");
+    this->devices[0].AddInterface(INTERFACE_TYPE::INT_GIGABYTE, "0/4");
+    this->devices[0].AddIP(COMMAND_TYPE::IPv6, "0/0", "0::0", 64);
+    this->devices[0].AddIP(COMMAND_TYPE::IPv6, "0/1", "0::0", 64);
+    this->devices[0].AddIP(COMMAND_TYPE::IPv6, "0/0", "0::0", 64);
+    this->devices[0].AddIP(COMMAND_TYPE::IPv6, "0/0", "0::0", 64);
+}
+
 void CLI::DrawTextDevices(){
     unsigned short int start = 1; // TO DO: based on ncursor
     for (unsigned short int i = start; i <= this->devices.size(); i++)
@@ -30,6 +48,9 @@ void CLI::DrawTextDevices(){
             }    
         }
     }
+    std::stringstream tst;
+    tst << "ACTIVE: " << this->ACTIVE_COLL << "A0: " << this->Active[0] <<" A1: " << this->Active[1] << " A2: " << this->Active[2]; 
+    this->device_mode_ui->Print(tst.str(), 2, 10);
 }
 
 void CLI::Resize(){
@@ -72,22 +93,7 @@ CLI::CLI(/* args */)
     this->device_mode_ui = new NC_WINDOW("MODE", 20 , 0, 36, MAX_Y);
     this->device_atributes_ui = new NC_WINDOW("CONFIG", 56 , 0, 60, MAX_Y);
 
-    this->AddDevice(NET_DEVICE_TYPE::ROUTER);
-    this->AddDevice(NET_DEVICE_TYPE::ROUTER);
-    this->devices[0].SetHostname("Smerovac smeru");
-    this->devices[1].SetHostname("Autismus");
-    this->devices[0].AddInterface(INTERFACE_TYPE::INT_FAST, "0/0");
-    this->devices[0].AddInterface(INTERFACE_TYPE::INT_FAST, "0/1");
-    this->devices[0].AddInterface(INTERFACE_TYPE::INT_FAST, "0/2");
-    this->devices[0].AddInterface(INTERFACE_TYPE::INT_FAST, "0/3");
-    this->devices[0].AddInterface(INTERFACE_TYPE::INT_FAST, "0/4");
-    this->devices[0].AddInterface(INTERFACE_TYPE::INT_GIGABYTE, "0/0");
-    this->devices[0].AddInterface(INTERFACE_TYPE::INT_GIGABYTE, "0/4");
-    this->devices[0].AddIP(COMMAND_TYPE::IPv6, "0/0", "0::0", 64);
-    this->devices[0].AddIP(COMMAND_TYPE::IPv6, "0/1", "0::0", 64);
-    this->devices[0].AddIP(COMMAND_TYPE::IPv6, "0/0", "0::0", 64);
-    this->devices[0].AddIP(COMMAND_TYPE::IPv6, "0/0", "0::0", 64);
-
+    this->LoadData();
 }
 
 CLI::~CLI()
@@ -105,25 +111,17 @@ void CLI::START_RUNTIME(){
     {
         switch (INPUT)
         {
-        case KEY_UP:
-        if (cursor.y == 0) break;
-            cursor.y--;
-            HandleCursor();
+        case 'w':
+            ChangeActive(0, 0);
             break;
-        case KEY_DOWN:
-            if (cursor.y == CURSOR_Y_MAX) break;
-            cursor.y++;
-            HandleCursor();
+        case 's':
+            ChangeActive(0 ,1);
             break;
-        case KEY_LEFT:
-            if (cursor.x == 0) break;
-            cursor.x--;
-            HandleCursor();
+        case 'a':
+            ChangeActive(1, 0);
             break;
-        case KEY_RIGHT:
-            if (cursor.x == CURSOR_X_MAX) break;
-            cursor.x++;
-            HandleCursor();
+        case 'd':
+            ChangeActive(1, 1);
             break;
         default:
             break;
@@ -140,8 +138,113 @@ bool CLI::AddDevice(NET_DEVICE_TYPE type){
     return 1;
 }
 
-void CLI::HandleCursor(){
-
+void CLI::ChangeActive(bool change_coll, bool increase){
+    if (change_coll){
+        if (increase)
+        {
+            switch (this->ACTIVE_COLL){
+            case 0: //device list
+                this->ACTIVE_COLL++;
+                this->Active[1] = 0;
+                break;
+            case 1: //interface list
+                this->ACTIVE_COLL++;
+                this->Active[2] = 0;
+                break;
+            case 2: //command list
+                //NOTHING AT EDGE
+                break;
+            default: // INVALID
+                break;
+            }
+        }
+        else{
+            switch (this->ACTIVE_COLL){
+            case 0: //device list
+                //NOTHING AT EDGE
+                break;
+            case 1: //interface list
+                this->ACTIVE_COLL--;
+                break;
+            case 2: //command list
+                this->ACTIVE_COLL--;
+                break;
+            default: // INVALID
+                break;
+            }
+        }
+    }
+    else if (!change_coll && increase){
+        switch (this->ACTIVE_COLL)
+        {
+        case 0: //device list
+            if (this->Active[0] + 1 > this->devices.size() - 1)
+                break;
+            else{
+                this->Active[0]++;
+            }
+            break;
+        case 1: //interface list
+            if (this->devices.size() > 0){
+                if (this->Active[1] + 1 > this->devices[this->Active[0]].GetInterfaces().size() - 1)
+                    break;
+                else{
+                    this->Active[1]++;
+                }
+            }
+            break;
+        case 2: //command list
+            // if (this->devices.size() > 0){
+            //     if (this->devices[this->Active[0]].GetInterfaces().size() > 0)
+            //     {
+            //         if (this->Active[2] + 1 > this->devices[this->Active[0]].GetInterfaces()[this->Active[1]].GetCommands().size() - 1)
+            //             break;
+            //         else{
+            //             this->Active[2]++;
+            //         }
+            //     }
+            // }
+            break;
+        default: // INVALID
+            break;
+        }   
+    }
+    else{
+        switch (this->ACTIVE_COLL)
+        {
+        case 0: //device list
+            // if (this->Active[0] > this->devices.size() - 1 || this->Active[0] == 0)
+            //     break;
+            // else{
+            //     this->Active[0]--;
+            // }
+            break;
+        case 1: //interface list
+            if (this->devices.size() > 0 || this->Active[1] == 0){
+                if (this->Active[1] > this->devices[this->Active[0]].GetInterfaces().size() - 1)
+                    break;
+                else{
+                    this->Active[1]--;
+                }
+            }
+            break;
+        case 2: //command list
+            if (this->devices.size() > 0 || this->Active[2] == 0){
+                if (this->devices[this->Active[0]].GetInterfaces().size() > 0)
+                {
+                    if (this->Active[2] > this->devices[this->Active[0]].GetInterfaces()[this->Active[1]].GetCommands().size() - 1)
+                        break;
+                    else{
+                        this->Active[2]--;
+                    }
+                }
+            }
+            break;
+        default: // INVALID
+            break;
+        }  
+    }
+    Resize();
 }
 
 void RESIZER(int sig){

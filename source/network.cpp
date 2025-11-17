@@ -130,4 +130,15 @@ bool NET_DEVICE::AddInterface(INTERFACE_TYPE interface_type, std::string identif
     this->interfaces.push_back(INTERFACE(interface_type, identifier));
     return 1;
 }
+
+bool NET_DEVICE::AddInterfaceRange(INTERFACE_TYPE interface_type, std::string identifier_prefix, unsigned short int count){
+    std::stringstream buffer;
+    for (unsigned short int i = 0; i < count; i++){
+        buffer.str(std::string());
+        buffer << identifier_prefix << i;
+        this->interfaces.push_back(INTERFACE(interface_type, buffer.str()));
+    }
+    return 1;
+    
+}
 #pragma endregion

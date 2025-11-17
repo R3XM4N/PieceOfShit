@@ -85,6 +85,7 @@ public:
     std::string ToString();
     bool SetHostname(std::string new_hostname);
     bool AddInterface(INTERFACE_TYPE interface_type, std::string identifier);
+    bool AddInterfaceRange(INTERFACE_TYPE interface_type, std::string identifier_prefix, unsigned short int count);
     NET_DEVICE(NET_DEVICE_TYPE deviceType);
     ~NET_DEVICE();
 
