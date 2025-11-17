@@ -14,29 +14,31 @@ std::string interfaceTypeToString(INTERFACE_TYPE int_type){
     switch (int_type)
     {
     case INTERFACE_TYPE::ENABLE:
-        return "#";
+        return "(enable)#";
         break;
     case INTERFACE_TYPE::GLOBAL_CONF:
-        return "(global): ";
+        return "(global)# ";
         break;
     case INTERFACE_TYPE::VLAN_CONF:
-        return "(vlan): ";
+        return "(vlan)# ";
         break;
     case INTERFACE_TYPE::OSPF_CONF:
-        return "(ospf): ";
+        return "(ospf)# ";
         break;
     case INTERFACE_TYPE::INT_GIGABYTE:
-        return "(gi): ";
+        return "(gi)# ";
         break;
     case INTERFACE_TYPE::INT_FAST:
-        return "(fa): ";
+        return "(fa)# ";
+        break;
+    case INTERFACE_TYPE::DHCP_CONF:
+        return "(dhcp-config)#";
         break;
     default:
-        return "ERROR";
+        return "(ERROR)#";
         break;
     }
 }
-
 
 #pragma region IP COMMAND
 IP_C::IP_C(COMMAND_TYPE cmd, std::string address, unsigned int suffix){
@@ -46,24 +48,79 @@ IP_C::IP_C(COMMAND_TYPE cmd, std::string address, unsigned int suffix){
 }
 std::vector<std::string> IP_C::GetCommands(){
     std::stringstream output;
-    if (command == COMMAND_TYPE::IPv4)
+    if (this->command == COMMAND_TYPE::IPv4)
         output << "ip address " << this->address << " TODO: MASK TRANSLATION/" << this->mask_suffix; //TO DO: add (mask)
-    if (command == COMMAND_TYPE::IPv6)
-        output << "ipv6 address " << this->address << " /" << this->mask_suffix;
+    else if (this->command == COMMAND_TYPE::IPv6)
+        output << "ipv6 address " << this->address << "/" << this->mask_suffix;
     else return {"IP COMMAND WRONGLY INITIALIZED (COMMAND)"};
     return {output.str()};
 }
 std::vector<std::string> IP_C::ToString(){
     std::stringstream output;
-    if (command == COMMAND_TYPE::IPv4)
+    if (this->command == COMMAND_TYPE::IPv4)
         output << "IPv4: " << this->address << " /" << this->mask_suffix;
-    if (command == COMMAND_TYPE::IPv6)
+    else if (this->command == COMMAND_TYPE::IPv6)
         output << "IPv6: " << this->address << " /" << this->mask_suffix;
     else return {"IP COMMAND WRONGLY INITIALIZED (TEXT)"};
     return {output.str()};
 }
 #pragma endregion
 
+#pragma region DHCP
+DHCP_C::DHCP_C(COMMAND_TYPE cmd, std::string pool_name, std::string network, std::string defaultg, std::string domain_n)
+{
+    this->command = cmd;
+    this->pool_name = pool_name;
+    this->network_addr_and_mask = network;
+    this->default_gateway = defaultg;
+    this->domain_name = domain_n;
+}
+
+DHCP_C::~DHCP_C()
+{
+}
+std::vector<std::string> DHCP_C::ToString(){
+    std::vector<std::string> commands;
+    std::stringstream text;
+    commands.push_back("(conf)# ip dhcp pool " + this->pool_name);
+    commands.push_back("network " + this->network_addr_and_mask);
+    commands.push_back("default-router " + this->default_gateway);
+    commands.push_back("dns-server " + this->dns_address);
+    commands.push_back("domain " + this->domain_name);
+    commands.push_back("lease <d> [<h> [<m>]]");
+    commands.push_back("ip dhcp excluded-addr <od> <do> ");
+    return commands;
+}
+
+std::vector<std::string> DHCP_C::GetCommands(){
+    std::vector<std::string> commands;
+    std::stringstream text;
+    commands.push_back("(conf)# ip dhcp pool " + this->pool_name);
+    commands.push_back("network " + this->network_addr_and_mask);
+    commands.push_back("default-router " + this->default_gateway);
+    commands.push_back("dns-server " + this->dns_address);
+    commands.push_back("domain " + this->domain_name);
+    commands.push_back("lease <d> [<h> [<m>]]");
+    commands.push_back("ip dhcp excluded-addr <od> <do> ");
+    return commands;
+}
+/*
+(config)# ip dhcp pool <název>
+(dhcp-config)# network <síť> <maska>
+adresa sítě, maska podsítě
+(dhcp-config)# default-router <adresa>
+adresa výchozí brány
+(dhcp-config)# dns-server <adresa>
+adresa DNS serveru
+(dhcp-config)# domain <doména>
+výchozí doména (např. vsb.cz)
+(dhcp-config)# lease {<d> [<h> [<m>]] |
+infinite}
+délka pronájmu adresy
+(config)# ip dhcp excluded-addr <od> <do>
+nepřidělované adresy z poolu
+*/
+#pragma endregion
 
 #pragma region INTERFACE
 unsigned int INTERFACE::next_id = 0;
@@ -87,7 +144,10 @@ std::vector<NETCOMMAND*>& INTERFACE::GetCommands(){
     return this->config;
 }
 std::string INTERFACE::ToString(){
-    return interfaceTypeToString(this->TYPE) + this->GetIdentifier();
+    if (this->TYPE != INTERFACE_TYPE::ENABLE && this->TYPE != INTERFACE_TYPE::GLOBAL_CONF ){
+        return interfaceTypeToString(this->TYPE) + this->GetIdentifier();
+    }
+    return interfaceTypeToString(this->TYPE);
 }
 #pragma endregion
 
@@ -106,8 +166,11 @@ bool NET_DEVICE::AddIP(COMMAND_TYPE ip_type, std::string interface_identifier, s
     }
     return 0;
 }
+
 NET_DEVICE::NET_DEVICE(NET_DEVICE_TYPE deviceType) : INDENTIFIER(next_id++) 
 {
+    this->AddInterface(INTERFACE_TYPE::ENABLE, "enable");
+    this->AddInterface(INTERFACE_TYPE::GLOBAL_CONF, "global");
     this->device_type = device_type;
 }
 
@@ -124,6 +187,17 @@ std::string NET_DEVICE::Hostname(){
 bool NET_DEVICE::SetHostname(std::string new_hostname){
     this->HOSTNAME = new_hostname;
     return 1;
+}
+bool NET_DEVICE::AddDHCP(std::string pool_name, std::string network, std::string defaultg, std::string domain_n){
+    //TO DO: IF EXISTS RETURN 0
+    this->AddInterface(INTERFACE_TYPE::OSPF_CONF, pool_name);
+    for (INTERFACE &interf : this->GetInterfaces()){
+        if (interf.GetIdentifier() == pool_name){
+            interf.AddCommand(new DHCP_C(COMMAND_TYPE::DHCP, pool_name, network, defaultg, domain_n));
+            return 1;
+        }
+    }
+    return 0;
 }
 
 bool NET_DEVICE::AddInterface(INTERFACE_TYPE interface_type, std::string identifier){

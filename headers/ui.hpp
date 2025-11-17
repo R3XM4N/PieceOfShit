@@ -9,11 +9,6 @@
 
 void RESIZER(int sig);
 
-// struct ncursor{
-//     uint x;
-//     uint y;
-// };
-
 class CLI
 {
 private:
@@ -23,10 +18,8 @@ private:
     NC_WINDOW* device_atributes_ui = nullptr;
     unsigned short int MAX_X, MAX_Y;
     unsigned short int ACTIVE_COLL = 0;
-    unsigned short int Active[3] = {0,0,0}; // save active elements
-    // ncursor cursor = {0,0}; //location
-    // unsigned int CURSOR_X_MAX = 1;
-    // unsigned int CURSOR_Y_MAX = 1;
+    unsigned short int Active[3] = {0,0,0}; 
+    bool DISPLAY_MODE = 0;
     bool AddDevice(NET_DEVICE_TYPE type);
     void DrawTextDevices();
     void ChangeActive(bool change_coll, bool increase);

@@ -6,6 +6,8 @@ void CLI::LoadData(){
     this->AddDevice(NET_DEVICE_TYPE::ROUTER);
     this->devices[0].SetHostname("Smerovac smeru");
     this->devices[1].SetHostname("Autismus");
+    this->devices[1].AddDHCP("pool name xd", "0.0.0.0/32", "1.1.1.1", "jduspat.com");
+    this->devices[1].AddInterface(INTERFACE_TYPE::INT_FAST, "0/0");
     this->devices[0].AddInterface(INTERFACE_TYPE::INT_FAST, "0/0");
     this->devices[0].AddInterface(INTERFACE_TYPE::INT_FAST, "0/1");
     this->devices[0].AddInterface(INTERFACE_TYPE::INT_FAST, "0/2");
@@ -13,7 +15,9 @@ void CLI::LoadData(){
     this->devices[0].AddInterface(INTERFACE_TYPE::INT_FAST, "0/4");
     this->devices[0].AddInterface(INTERFACE_TYPE::INT_GIGABYTE, "0/0");
     this->devices[0].AddInterface(INTERFACE_TYPE::INT_GIGABYTE, "0/4");
+    this->devices[0].AddInterface(INTERFACE_TYPE::INT_GIGABYTE, "0/4");
     this->devices[0].AddIP(COMMAND_TYPE::IPv6, "0/0", "0::0", 64);
+    this->devices[1].AddIP(COMMAND_TYPE::IPv4, "0/0", "0.0.0.0", 32);
     this->devices[0].AddIP(COMMAND_TYPE::IPv6, "0/1", "0::0", 64);
     this->devices[0].AddIP(COMMAND_TYPE::IPv6, "0/0", "0::0", 64);
     this->devices[0].AddIP(COMMAND_TYPE::IPv6, "0/0", "0::0", 64);
@@ -43,7 +47,11 @@ void CLI::DrawTextDevices(){
             if (this->devices[this->Active[0]].GetInterfaces()[this->Active[1]].GetCommands().size()){
                 start = 1;
                 for (auto &i : this->devices[this->Active[0]].GetInterfaces()[this->Active[1]].GetCommands()){
-                    std::vector<std::string> texts = i->ToString();
+                    std::vector<std::string> texts;
+                    if (this->DISPLAY_MODE == 0)
+                        texts = i->ToString();
+                    else
+                        texts = i->GetCommands();                    
                     for (std::string &text : texts){
                         if (start - 1 == this->Active[2] && this->ACTIVE_COLL > 1)
                             this->device_atributes_ui->CPrint(text, static_cast<unsigned short int>(2), start, 1);
@@ -133,6 +141,10 @@ void CLI::START_RUNTIME(){
         case 'd':
             ChangeActive(1, 1);
             break;
+        case 'e':
+            this->DISPLAY_MODE = !this->DISPLAY_MODE;
+            this->Resize();
+            break;
         default:
             break;
         }
@@ -180,9 +192,11 @@ void CLI::ChangeActive(bool change_coll, bool increase){
                 break;
             case 1: //interface list
                 this->ACTIVE_COLL--;
+                this->Active[1] = 0;
                 break;
             case 2: //command list
                 this->ACTIVE_COLL--;
+                this->Active[2] = 0;
                 break;
             default: // INVALID
                 break;

@@ -15,8 +15,9 @@ enum class INTERFACE_TYPE{
     NONE,
     ENABLE,
     GLOBAL_CONF,
-    VLAN_CONF,  
+    VLAN_CONF,
     OSPF_CONF,
+    DHCP_CONF,
     INT_GIGABYTE,
     INT_FAST
 };
@@ -28,7 +29,9 @@ enum class COMMAND_TYPE{
     IPv4,
     IPv6,
     VLAN_ACCESS,
-    VLAN_TRUNK
+    VLAN_TRUNK,
+    DHCP,
+    OSPF
 };
 
 class NETCOMMAND
@@ -52,6 +55,24 @@ public:
     std::vector<std::string> ToString() override;
     std::vector<std::string> GetCommands() override;
 };
+
+class DHCP_C : public NETCOMMAND
+{
+private:
+    std::string pool_name;
+    std::string network_addr_and_mask; //mask and suffix
+    std::string default_gateway;
+    std::string dns_address; //mask and suffix
+    std::string domain_name; //mask and suffix
+
+public:
+    std::vector<std::string> ToString() override;
+    std::vector<std::string> GetCommands() override;
+    DHCP_C(COMMAND_TYPE cmd, std::string pool_name, std::string network, std::string defaultg, std::string domain_n);
+    ~DHCP_C();
+};
+
+
 
 class INTERFACE
 {
@@ -83,6 +104,7 @@ public:
     std::vector<INTERFACE>& GetInterfaces();
     std::string Hostname();
     std::string ToString();
+    bool AddDHCP(std::string pool_name, std::string network, std::string defaultg, std::string domain_n);
     bool SetHostname(std::string new_hostname);
     bool AddInterface(INTERFACE_TYPE interface_type, std::string identifier);
     bool AddInterfaceRange(INTERFACE_TYPE interface_type, std::string identifier_prefix, unsigned short int count);
