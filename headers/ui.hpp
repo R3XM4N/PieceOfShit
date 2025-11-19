@@ -6,6 +6,8 @@
 #include <ncurses.h>
 #include "../headers/ncurses.hpp"
 #include "../headers/network.hpp"
+#include "../headers/datahandle.hpp"
+
 /**
  * @brief Required 'hook' to be able to bind a function to a csignal
  * @param sig 
