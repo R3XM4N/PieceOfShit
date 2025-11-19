@@ -1,10 +1,6 @@
 #include "../headers/datahandle.hpp"
 
 template<typename T>
-LList<T>::LList(){
-
-}
-template<typename T>
 LList<T>::~LList(){
     while (this->root != nullptr){
         Node<T>* current_node = this->root;
@@ -64,3 +60,9 @@ const T& LList<T>::operator[](unsigned long int n) const{
     }
     return current_node->data;
 }
+
+template<typename T>
+typename LList<T>::iterator LList<T>::begin() { return iterator(root);}
+template<typename T>
+typename LList<T>::iterator LList<T>::end() { return iterator(nullptr);}
+

@@ -22,7 +22,7 @@ class CLI
 {
 private:
     /// @brief vector containing all the devices to display
-    std::vector<NET_DEVICE> devices;
+    LList<NET_DEVICE> devices;
     /// @brief Pointer to the window containing the device list
     NC_WINDOW* device_ui = nullptr;
     /// @brief Pointer to the window containing the selected devices interfaces/modes
