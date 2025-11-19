@@ -6,8 +6,6 @@
 #include <ncurses.h>
 #include "../headers/ncurses.hpp"
 #include "../headers/network.hpp"
-#include "../headers/datahandle.hpp"
-
 /**
  * @brief Required 'hook' to be able to bind a function to a csignal
  * @param sig 
@@ -22,7 +20,7 @@ class CLI
 {
 private:
     /// @brief vector containing all the devices to display
-    LList<NET_DEVICE> devices;
+    std::vector<NET_DEVICE> devices;
     /// @brief Pointer to the window containing the device list
     NC_WINDOW* device_ui = nullptr;
     /// @brief Pointer to the window containing the selected devices interfaces/modes

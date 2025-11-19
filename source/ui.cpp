@@ -47,7 +47,7 @@ void CLI::DrawTextDevices(){
             if (this->devices[this->Active[0]].GetInterfaces()[this->Active[1]].GetCommands().size()){
                 start = 1;
                 for (auto &i : this->devices[this->Active[0]].GetInterfaces()[this->Active[1]].GetCommands()){
-                    LList<std::string> texts;
+                    std::vector<std::string> texts;
                     if (this->DISPLAY_MODE == 0)
                         texts = i->ToString();
                     else

@@ -3,7 +3,7 @@
 
 #include <sstream>
 #include <string>
-#include "../headers/datahandle.hpp"
+#include <vector>
 
 ///@brief enumm Representing the type of network device
 enum class NET_DEVICE_TYPE{
@@ -51,14 +51,14 @@ public:
     // unsigned short int output_count_text, output_count_commands; 
     /**
      * @brief Method that returns the text format of the command
-     * @return LList<std::string> 
+     * @return std::vector<std::string> 
      */
-    virtual LList<std::string> ToString()= 0;
+    virtual std::vector<std::string> ToString()= 0;
     /**
      * @brief Method that returns commands required to be run on the interface for the command to be properly executed
-     * @return LList<std::string> 
+     * @return std::vector<std::string> 
      */
-    virtual LList<std::string> GetCommands()= 0;
+    virtual std::vector<std::string> GetCommands()= 0;
 };
 
 class IP_C : public NETCOMMAND 
@@ -69,8 +69,8 @@ private:
 public:
     IP_C(COMMAND_TYPE cmd, std::string address, unsigned int suffix);
     ~IP_C() = default;
-    LList<std::string> ToString() override;
-    LList<std::string> GetCommands() override;
+    std::vector<std::string> ToString() override;
+    std::vector<std::string> GetCommands() override;
 };
 
 class DHCP_C : public NETCOMMAND
@@ -83,8 +83,8 @@ private:
     std::string domain_name; //mask and suffix
 
 public:
-    LList<std::string> ToString() override;
-    LList<std::string> GetCommands() override;
+    std::vector<std::string> ToString() override;
+    std::vector<std::string> GetCommands() override;
     DHCP_C(COMMAND_TYPE cmd, std::string pool_name, std::string network, std::string defaultg, std::string domain_n);
     ~DHCP_C();
 };
@@ -103,7 +103,7 @@ private:
     /// @brief The identifier of this interface/mode (for interfaces "0/0" or "0/0/3", for vlan "40" etc...) 
     std::string identifier = "INVALID INTERFACE";
     /// @brief Commands assigned to this interface/mode of operation
-    LList<NETCOMMAND*> config;
+    std::vector<NETCOMMAND*> config;
 public:
     /// @brief Constructor for the interface/mode
     /// @param int_type Type of interface/mode of operation
@@ -116,7 +116,7 @@ public:
     void AddCommand(NETCOMMAND* declared_command);
     /// @brief Gets a reference to the private pointer of commands
     /// @return reference to a vector of commands associated with this interface
-    LList<NETCOMMAND*>& GetCommands();
+    std::vector<NETCOMMAND*>& GetCommands();
     /// @brief Getter for identifier
     /// @return string Indetifier
     std::string GetIdentifier();
@@ -137,13 +137,13 @@ private:
     /// @brief Hostname of this device
     std::string HOSTNAME = "INVALID DEVICE";
     /// @brief Interfaces and modes of operation on this device
-    LList<INTERFACE> interfaces;
+    std::vector<INTERFACE> interfaces;
     /// @brief The type of device
     NET_DEVICE_TYPE device_type = NET_DEVICE_TYPE::NONE;
 public:
     /// @brief Gives reference to the private vector of interfaces
     /// @return Reference to a vector of interfaces
-    LList<INTERFACE>& GetInterfaces();
+    std::vector<INTERFACE>& GetInterfaces();
     /// @brief Hostname getter
     /// @return string Hostname
     std::string Hostname();

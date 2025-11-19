@@ -46,7 +46,7 @@ IP_C::IP_C(COMMAND_TYPE cmd, std::string address, unsigned int suffix){
     this->address = address;
     this->mask_suffix = suffix;
 }
-LList<std::string> IP_C::GetCommands(){
+std::vector<std::string> IP_C::GetCommands(){
     std::stringstream output;
     if (this->command == COMMAND_TYPE::IPv4)
         output << "ip address " << this->address << " TODO: MASK TRANSLATION/" << this->mask_suffix; //TO DO: add (mask)
@@ -55,7 +55,7 @@ LList<std::string> IP_C::GetCommands(){
     else return {"IP COMMAND WRONGLY INITIALIZED (COMMAND)"};
     return {output.str()};
 }
-LList<std::string> IP_C::ToString(){
+std::vector<std::string> IP_C::ToString(){
     std::stringstream output;
     if (this->command == COMMAND_TYPE::IPv4)
         output << "IPv4: " << this->address << " /" << this->mask_suffix;
@@ -79,8 +79,8 @@ DHCP_C::DHCP_C(COMMAND_TYPE cmd, std::string pool_name, std::string network, std
 DHCP_C::~DHCP_C()
 {
 }
-LList<std::string> DHCP_C::ToString(){
-    LList<std::string> commands;
+std::vector<std::string> DHCP_C::ToString(){
+    std::vector<std::string> commands;
     std::stringstream text;
     commands.push_back("(conf)# ip dhcp pool " + this->pool_name);
     commands.push_back("network " + this->network_addr_and_mask);
@@ -92,8 +92,8 @@ LList<std::string> DHCP_C::ToString(){
     return commands;
 }
 
-LList<std::string> DHCP_C::GetCommands(){
-    LList<std::string> commands;
+std::vector<std::string> DHCP_C::GetCommands(){
+    std::vector<std::string> commands;
     std::stringstream text;
     commands.push_back("(conf)# ip dhcp pool " + this->pool_name);
     commands.push_back("network " + this->network_addr_and_mask);
@@ -140,7 +140,7 @@ void INTERFACE::AddCommand(NETCOMMAND* declared_command){
 std::string INTERFACE::GetIdentifier(){
     return this->identifier;
 }
-LList<NETCOMMAND*>& INTERFACE::GetCommands(){
+std::vector<NETCOMMAND*>& INTERFACE::GetCommands(){
     return this->config;
 }
 std::string INTERFACE::ToString(){
@@ -153,7 +153,7 @@ std::string INTERFACE::ToString(){
 
 #pragma region NET_DEVICE
 unsigned int NET_DEVICE::next_id = 0;
-LList<INTERFACE>& NET_DEVICE::GetInterfaces(){
+std::vector<INTERFACE>& NET_DEVICE::GetInterfaces(){
     return this->interfaces;
 }
 
