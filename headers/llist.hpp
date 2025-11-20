@@ -3,21 +3,22 @@
 
 #include <stdexcept>
 #include <cstddef>
+#include <memory>
 
 #pragma region LL definitions
 template<typename T>
 struct Node
 {
     T data;
-    Node* next;
+    std::unique_ptr<Node<T>> next;
 };
 
 template<typename T>
 class LList
 {
 private:
-    Node<T>* root  = nullptr;
-    void ReSized();
+    std::unique_ptr<Node<T>> root  = nullptr;
+    // void ReSized();
 public:
     unsigned long int size = 0;
     T& operator[](unsigned long int n);
@@ -29,7 +30,7 @@ public:
 
     LList<T>& SelfRefrence();
     LList() = default;
-    ~LList();
+    ~LList() = default;
     
     struct iterator;
     iterator begin();
@@ -61,43 +62,31 @@ struct LList<T>::iterator{
 };
 
 template<typename T>
-LList<T>::~LList(){
-    while (this->root != nullptr){
-        Node<T>* current_node = this->root;
-        this->root = this->root->next;
-        delete current_node;
-    }
-}
-template<typename T>
 unsigned long int LList<T>::Size(){
     return this->size;
 }
-template<typename T>
-void LList<T>::ReSized(){
-    if (this->root == nullptr) return;
-    unsigned long int counter= 1; 
-    Node<T>* current_node = this->root;
-    while (current_node->next != nullptr){
-        current_node = current_node->next;
-        counter++;
-    }
-    this->size = counter;
-}
+// template<typename T>
+// void LList<T>::ReSized(){
+//     if (this->root == nullptr) return;
+//     unsigned long int counter= 1; 
+//     Node<T>* current_node = this->root;
+//     while (current_node->next != nullptr){
+//         current_node = current_node->next;
+//         counter++;
+//     }
+//     this->size = counter;
+// }
 template<typename T>
 void LList<T>::Add(T data){
-    if (this->root == nullptr){
-        this->root = new Node<T>{
-            data, nullptr
-        };
-    }
+    std::unique_ptr<Node<T>> new_node = std::make_unique<Node<T>>();
+    new_node->data = std::move(data);
+    if (!this->root) root = std::move(new_node);    
     else{
-        Node<T>* current_node = this->root;
-        while (current_node->next != nullptr){
-            current_node = current_node->next;
+        Node<T>* current_node = root.get();
+        while (current_node->next){
+            current_node = current_node->next.get();
         }
-        current_node->next = new Node<T>{
-            data, nullptr
-        };
+        current_node->next = std::move(new_node);
     }
     this->size++;
 }
@@ -107,76 +96,49 @@ void LList<T>::push_back(T data){
 }
 template<typename T>
 void LList<T>::DeleteAt(unsigned long int n){
-    if (this->root == nullptr) return;
+    if (!this->root) return;
     if (n == 0){
-        if (root->next == nullptr){
-            delete this->root;
-            this->root = nullptr;
-            ReSized();
-            return;
-        }
-        else{
-            Node<T>* target = this->root;
-            this->root = target->next;
-            delete target;
-            target = nullptr;
-            ReSized();
-            return;
-        }
+        this->root = std::move(this->root->next);
+        this->size--;
+        return;
     }
-    
-    Node<T>* pre_target = this->root;
-    for (unsigned long int i = 0; i < n - 1; i++){
-        if (pre_target->next != nullptr){
-            pre_target = pre_target->next;
-        }
-        else throw std::out_of_range("LList index out of range");
+    Node<T>* pre_target = this->root.get();
+    for (unsigned long int i = 0; i < n - 1 && pre_target->next; i++){
+        pre_target = pre_target->next.get();
     }
     if (pre_target->next == nullptr){
         throw std::out_of_range("LList index out of range");
-        return;
     }
-    else{
-        if (pre_target->next->next != nullptr){
-            Node<T>* new_next = pre_target->next->next;
-            delete pre_target->next;
-            pre_target->next = new_next;
-        }
-        else{
-            delete pre_target->next;
-            pre_target->next = nullptr;
-        }   
-    }
-    ReSized();
+    pre_target->next = std::move(pre_target->next.next);
+    size--;
+    // ReSized();
 }
 
 template<typename T>
 T& LList<T>::operator[](unsigned long int n){
-    if (this->root == nullptr) throw std::out_of_range("Can't access empty LList");
-    Node<T>* current_node = this->root;
+    if (!this->root) throw std::out_of_range("Can't access empty LList");
+    Node<T>* current_node = this->root.get();
     for (unsigned long int i = 0; i < n; i++){
-        if (current_node->next != nullptr){
-            current_node = current_node->next;
-        }
-        else throw std::out_of_range("LList index out of range");
+        if (!current_node->next) throw std::out_of_range("LList index out of range");
+        else 
+            current_node = current_node->next.get();
     }
     return current_node->data;
 }
 template<typename T>
 const T& LList<T>::operator[](unsigned long int n) const{
-    if (this->root == nullptr) throw std::out_of_range("Can't access empty LList");
-    Node<T>* current_node = this->root;
+    if (!this->root) throw std::out_of_range("Can't access empty LList");
+    Node<T>* current_node = this->root.get();
     for (unsigned long int i = 0; i < n; i++){
-        if (current_node->next != nullptr){
-            current_node = current_node->next;
-        }
-        else throw std::out_of_range("LList index out of range");
+        if (!current_node->next) throw std::out_of_range("LList index out of range");
+        else 
+            current_node = current_node->next.get();
     }
     return current_node->data;
 }
 
 template<typename T>
-typename LList<T>::iterator LList<T>::begin() { return iterator(root);}
+typename LList<T>::iterator LList<T>::begin() { return iterator(root.get());}
 template<typename T>
 typename LList<T>::iterator LList<T>::end() { return iterator(nullptr);}
 #pragma endregion

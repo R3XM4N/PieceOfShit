@@ -4,6 +4,8 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <memory>
+#include "../headers/llist.hpp"
 
 ///@brief enumm Representing the type of network device
 enum class NET_DEVICE_TYPE{
@@ -103,7 +105,7 @@ private:
     /// @brief The identifier of this interface/mode (for interfaces "0/0" or "0/0/3", for vlan "40" etc...) 
     std::string identifier = "INVALID INTERFACE";
     /// @brief Commands assigned to this interface/mode of operation
-    std::vector<NETCOMMAND*> config;
+    std::vector<std::shared_ptr<NETCOMMAND>> config;
 public:
     /// @brief Constructor for the interface/mode
     /// @param int_type Type of interface/mode of operation
@@ -113,10 +115,10 @@ public:
     ~INTERFACE();
     /// @brief Adds a command to the list of commands associated with this interface/mode of operation
     /// @param declared_command Pointer to the command that is supposed to be added
-    void AddCommand(NETCOMMAND* declared_command);
+    void AddCommand(std::shared_ptr<NETCOMMAND> declared_command);
     /// @brief Gets a reference to the private pointer of commands
     /// @return reference to a vector of commands associated with this interface
-    std::vector<NETCOMMAND*>& GetCommands();
+    std::vector<std::shared_ptr<NETCOMMAND>>& GetCommands();
     /// @brief Getter for identifier
     /// @return string Indetifier
     std::string GetIdentifier();

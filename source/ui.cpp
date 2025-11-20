@@ -6,6 +6,7 @@ void CLI::LoadData(){
     this->AddDevice(NET_DEVICE_TYPE::ROUTER);
     this->devices[0].SetHostname("Smerovac smeru");
     this->devices[1].SetHostname("Autismus");
+    this->devices[0].AddDHCP("pool name xd", "0.0.0.0/32", "1.1.1.1", "jduspat.com");
     this->devices[1].AddDHCP("pool name xd", "0.0.0.0/32", "1.1.1.1", "jduspat.com");
     this->devices[1].AddInterface(INTERFACE_TYPE::INT_FAST, "0/0");
     this->devices[0].AddInterface(INTERFACE_TYPE::INT_FAST, "0/0");

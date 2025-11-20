@@ -130,17 +130,17 @@ INTERFACE::INTERFACE(INTERFACE_TYPE int_type, std::string interface_identifier) 
 }
 
 INTERFACE::~INTERFACE(){
-    for (auto &command : config){
-        delete command;
-    }
+    // for (auto &command : config){
+    //     command.reset();
+    // }
 }
-void INTERFACE::AddCommand(NETCOMMAND* declared_command){
+void INTERFACE::AddCommand(std::shared_ptr<NETCOMMAND> declared_command){
     this->config.push_back(declared_command);
 }
 std::string INTERFACE::GetIdentifier(){
     return this->identifier;
 }
-std::vector<NETCOMMAND*>& INTERFACE::GetCommands(){
+std::vector<std::shared_ptr<NETCOMMAND>>& INTERFACE::GetCommands(){
     return this->config;
 }
 std::string INTERFACE::ToString(){
@@ -160,7 +160,7 @@ std::vector<INTERFACE>& NET_DEVICE::GetInterfaces(){
 bool NET_DEVICE::AddIP(COMMAND_TYPE ip_type, std::string interface_identifier, std::string address, unsigned int suffix){
     for (INTERFACE &interface : this->interfaces){
         if (interface.GetIdentifier() == interface_identifier){
-            interface.AddCommand(new IP_C(ip_type, address, suffix));
+            interface.AddCommand(std::make_shared<IP_C>(IP_C(ip_type, address, suffix)));
             return 1;
         }
     }
@@ -193,7 +193,7 @@ bool NET_DEVICE::AddDHCP(std::string pool_name, std::string network, std::string
     this->AddInterface(INTERFACE_TYPE::OSPF_CONF, pool_name);
     for (INTERFACE &interf : this->GetInterfaces()){
         if (interf.GetIdentifier() == pool_name){
-            interf.AddCommand(new DHCP_C(COMMAND_TYPE::DHCP, pool_name, network, defaultg, domain_n));
+            interf.AddCommand(std::make_shared<DHCP_C>(DHCP_C(COMMAND_TYPE::DHCP, pool_name, network, defaultg, domain_n)));
             return 1;
         }
     }
