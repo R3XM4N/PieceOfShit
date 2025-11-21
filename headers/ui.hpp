@@ -6,11 +6,11 @@
 #include <ncurses.h>
 #include "../headers/ncurses.hpp"
 #include "../headers/network.hpp"
-/**
- * @brief Required 'hook' to be able to bind a function to a csignal
- * @param sig 
- */
-void RESIZER(int sig);
+// /**
+//  * @brief Required 'hook' to be able to bind a function to a csignal
+//  * @param sig 
+//  */
+// void RESIZER(int sig);
 
 /**
  * @brief Class representing the command line interface

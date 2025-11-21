@@ -67,10 +67,14 @@ void CLI::DrawTextDevices(){
     std::stringstream tst;
     tst << "DEBUG: ACTIVE: " << this->ACTIVE_COLL << " A0: " << this->Active[0] <<" A1: " << this->Active[1] << " A2: " << this->Active[2]; 
     this->device_atributes_ui->Print(tst.str(), 2, this->MAX_Y - 2);
+    tst.str("");
+    tst << "Cols: " << COLS << "Lines: " << LINES;
+    this->device_atributes_ui->Print(tst.str(), 2, this->MAX_Y - 3);
 }
 
 void CLI::Resize(){
-    resizeterm(LINES, COLS);
+    resizeterm(0, 0);
+    // doupdate();s
     clear();
     refresh();
 
@@ -79,7 +83,8 @@ void CLI::Resize(){
 
     this->device_ui->ReBuild(0, 0, 20, MAX_Y);
     this->device_mode_ui->ReBuild(20 , 0, 36, MAX_Y);
-    this->device_atributes_ui->ReBuild(56 , 0, 60, MAX_Y);
+    // this->device_atributes_ui->ReBuild(56 , 0, 60, MAX_Y);
+    this->device_atributes_ui->ReBuild(56 , 0, (this->MAX_X - 56) - ((this->MAX_X) % 2), MAX_Y);
     
     this->device_ui->Box();
     this->device_mode_ui->Box();
@@ -104,13 +109,14 @@ CLI::CLI(/* args */)
     curs_set(0);
     init_pair(1, COLOR_BLACK, COLOR_WHITE);
     init_pair(2, COLOR_GREEN, COLOR_BLACK);
-    std::signal(SIGWINCH, RESIZER);
+    // std::signal(SIGWINCH, RESIZER);
     this->MAX_X = static_cast<unsigned short int>(COLS);
     this->MAX_Y = static_cast<unsigned short int>(LINES);
 
     this->device_ui = new NC_WINDOW("LIST", 0, 0, 20, MAX_Y);
     this->device_mode_ui = new NC_WINDOW("MODE", 20 , 0, 36, MAX_Y);
-    this->device_atributes_ui = new NC_WINDOW("CONFIG", 56 , 0, 60, MAX_Y);
+    // this->device_atributes_ui = new NC_WINDOW("CONFIG", 56 , 0, 60, MAX_Y);
+    this->device_atributes_ui = new NC_WINDOW("CONFIG", 56 , 0, (this->MAX_X - 56) - ((this->MAX_X) % 2), MAX_Y);
 
     this->LoadData();
 }
@@ -125,8 +131,8 @@ CLI::~CLI()
 void CLI::START_RUNTIME(){
     
     Resize();
-    char INPUT;
-    while (INPUT = getch(), INPUT != 'q')
+    int INPUT;
+    while (INPUT = wgetch(stdscr), INPUT != 'q')
     {
         switch (INPUT)
         {
@@ -146,9 +152,13 @@ void CLI::START_RUNTIME(){
             this->DISPLAY_MODE = !this->DISPLAY_MODE;
             this->Resize();
             break;
+        case KEY_RESIZE:
+            this->Resize();
+            break;
         default:
             break;
         }
+        INPUT = 0;
     }
     endwin();
     // this->device_atributes_ui->ConsoleLog();
@@ -237,6 +247,6 @@ void CLI::ChangeActive(bool change_coll, bool increase){
     Resize();
 }
 
-void RESIZER(int sig){
-    ACTIVE_CLI->Resize();
-}
+// void RESIZER(int sig){
+//     // ACTIVE_CLI->Resize();
+// }
