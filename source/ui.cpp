@@ -1,5 +1,5 @@
 #include "../headers/ui.hpp"
-CLI* ACTIVE_CLI = nullptr;
+// CLI* ACTIVE_CLI = nullptr;
 
 void CLI::LoadData(){
     this->AddDevice(NET_DEVICE_TYPE::ROUTER);
@@ -144,7 +144,7 @@ unsigned long int CLI::CurseChoice(const std::vector<std::string> choices){
     bool selecting_flag = 0;
     while (!selecting_flag){
         clear();
-        mvwprintw(stdscr, LINES - 1, 0, "Sex je %d", choice);
+        // mvwprintw(stdscr, LINES - 1, 0, "Sex je %d", choice);
         for (size_t i = 0; i < choices.size(); i++)
         {
             if (choice == i){
@@ -184,25 +184,70 @@ unsigned long int CLI::CurseChoice(const std::vector<std::string> choices){
 }
 bool CLI::CLDataAddDR(){
     bool editing_flag = 1;
-    std::vector<std::string> selections = {"1. Add devices.", "2. Add interfaces/modes.","3. Add commands", "4. Exit"};
+    std::vector<std::string> selections = {};
     while (editing_flag)
     {
-        switch (CurseChoice(selections))
+        switch (CurseChoice({"1. Add devices.", "2. Add interfaces/modes.","3. Add commands", "4. Exit"}))
         {
-        case 0:
-            CurseChoice({"sex", "sex**2"});
+        case 0:{
+            unsigned short int device_add = CurseChoice({"Router", "Switch (L2)"});
             break;
+            }
         case 1:
-            
-            break;
+            {
+                if (this->devices.size() == 0){
+                    std::cout << "\033[2J\033[H"<< "\033[2J";
+                    std::cout << "You don't have any devices to add interfaces/modes on, maybe add some?\n";
+                    getch();
+                    std::cout << "\033[2J\033[H"<< "\033[2J";
+                }
+                else{
+                    selections = {};
+                    for (NET_DEVICE &dev : this->devices){
+                        selections.push_back(dev.Hostname());
+                    }
+                    unsigned long int device = CurseChoice(selections);
+                }
+                break;
+            }
         case 2:
-            break;
+            {
+                if (this->devices.size() == 0){
+                    std::cout << "\033[2J\033[H"<< "\033[2J";
+                    std::cout << "You don't have any devices to add interfaces/modes on, maybe add some?\n";
+                    getch();
+                    std::cout << "\033[2J\033[H"<< "\033[2J";
+                }
+                else{
+                    selections = {};
+                    for (NET_DEVICE &dev : this->devices){
+                        selections.push_back(dev.Hostname());
+                    }
+                    unsigned long int device = CurseChoice(selections);
+
+                    if (this->devices[device].GetInterfaces().size() == 0){
+                        std::cout << "\033[2J\033[H"<< "\033[2J";
+                        std::cout << "You don't have any interfaces/modes to add commands on, maybe add some?\n";
+                        getch();
+                        std::cout << "\033[2J\033[H"<< "\033[2J";
+                    }
+                    else{
+                        selections = {};
+                        for (INTERFACE &intr : this->devices[device].GetInterfaces()){
+                            selections.push_back(intr.ToString());
+                        }
+                        unsigned long int interface = CurseChoice(selections);
+                    }
+                }
+                break;
+            }
         case 3:
             editing_flag = 0;
             break;
         default:
             break;
         }
+        selections = {};
     }
     
 
