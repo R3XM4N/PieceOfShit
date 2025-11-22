@@ -172,6 +172,19 @@ NET_DEVICE::NET_DEVICE(NET_DEVICE_TYPE deviceType) : INDENTIFIER(next_id++)
     this->AddInterface(INTERFACE_TYPE::ENABLE, "enable");
     this->AddInterface(INTERFACE_TYPE::GLOBAL_CONF, "global");
     this->device_type = device_type;
+    std::stringstream device_name;
+    switch (deviceType)
+    {
+    case NET_DEVICE_TYPE::ROUTER:
+        device_name << "Router: " << this->INDENTIFIER;
+        break;
+    case NET_DEVICE_TYPE::SWITCH_L2:
+        device_name << "Switch: " << this->INDENTIFIER;
+        break;
+    default:
+        break;
+    }
+    this->HOSTNAME = device_name.str();
 }
 
 NET_DEVICE::~NET_DEVICE()

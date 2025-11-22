@@ -6,13 +6,11 @@
 #include "headers/ncurses.hpp"
 #include "headers/ui.hpp"
 
-CLI* interface;
 
 int main()
 {
-    interface = new CLI();
-    interface->START_RUNTIME();
-    delete(interface);
+    CLI interface = CLI();
+    interface.START_RUNTIME();
 
     // initscr();
     // cbreak();

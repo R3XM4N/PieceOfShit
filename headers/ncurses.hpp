@@ -6,6 +6,7 @@
 #include <string>
 #include <iostream>
 
+void sprintstd(int x, int y, const char* text);
 /**
  * @brief A struct representing an ncurse window
  * @param name Descriptive name of the element

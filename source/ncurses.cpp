@@ -87,3 +87,7 @@ unsigned short int NC_WINDOW::GetX(){return this->self->x;}
 unsigned short int NC_WINDOW::GetY(){return this->self->y;}
 unsigned short int NC_WINDOW::GetWidth(){return this->self->width;}
 unsigned short int NC_WINDOW::GetHeigth(){return this->self->height;}
+
+void sprintstd(int x, int y, const char* text){
+    mvprintw(y, x, text);
+}

@@ -4,6 +4,7 @@ CLI* ACTIVE_CLI = nullptr;
 void CLI::LoadData(){
     this->AddDevice(NET_DEVICE_TYPE::ROUTER);
     this->AddDevice(NET_DEVICE_TYPE::ROUTER);
+    this->AddDevice(NET_DEVICE_TYPE::ROUTER);
     this->devices[0].SetHostname("Smerovac smeru");
     this->devices[1].SetHostname("Autismus");
     this->devices[0].AddDHCP("pool name xd", "0.0.0.0/32", "1.1.1.1", "jduspat.com");
@@ -26,6 +27,9 @@ void CLI::LoadData(){
 
 void CLI::DrawTextDevices(){
     unsigned short int start = 1; // TO DO: based on ncursor
+    this->device_ui->Print("Devices", static_cast<unsigned short int>(this->device_ui->GetWidth() / 2 - (this->device_ui->GetWidth() % 2) - 4), 0);
+    this->device_mode_ui->Print("Interfaces/modes", static_cast<unsigned short int>(this->device_mode_ui->GetWidth() / 2 - (this->device_mode_ui->GetWidth() % 2) - 8), 0);
+    this->device_atributes_ui->Print("Commands", static_cast<unsigned short int>(this->device_atributes_ui->GetWidth() / 2 - (this->device_atributes_ui->GetWidth() % 2) - 4), 0);
     for (unsigned short int i = start; i <= this->devices.size(); i++)
     {
         if (i - 1 == this->Active[0])
@@ -43,7 +47,6 @@ void CLI::DrawTextDevices(){
                 this->device_mode_ui->Print(this->devices[this->Active[0]].GetInterfaces()[start - 1].ToString(), static_cast<unsigned short int>(2), start);
             start++;
         }
-
         if (this->devices[this->Active[0]].GetInterfaces().size() > 0){
             if (this->devices[this->Active[0]].GetInterfaces()[this->Active[1]].GetCommands().size()){
                 start = 1;
@@ -74,7 +77,7 @@ void CLI::DrawTextDevices(){
 
 void CLI::Resize(){
     resizeterm(0, 0);
-    // doupdate();s
+    // doupdate();
     clear();
     refresh();
 
@@ -98,18 +101,23 @@ void CLI::Resize(){
     this->device_atributes_ui->Refresh();
 }
 
-CLI::CLI(/* args */)
-{
+void CLI::NcurseStart(){
     initscr();
     start_color();
-    ACTIVE_CLI = this;
     cbreak();
     noecho();
     keypad(stdscr, TRUE);
     curs_set(0);
     init_pair(1, COLOR_BLACK, COLOR_WHITE);
     init_pair(2, COLOR_GREEN, COLOR_BLACK);
-    // std::signal(SIGWINCH, RESIZER);
+}
+void CLI::NcurseEnd(){
+    endwin();
+}
+
+CLI::CLI(/* args */)
+{
+    this->NcurseStart();
     this->MAX_X = static_cast<unsigned short int>(COLS);
     this->MAX_Y = static_cast<unsigned short int>(LINES);
 
@@ -128,11 +136,84 @@ CLI::~CLI()
     delete(this->device_atributes_ui);
 }
 
-void CLI::START_RUNTIME(){
+unsigned long int CLI::CurseChoice(const std::vector<std::string> choices){
+    NcurseStart();
+    clear();
+    int INPUT;
+    unsigned long int choice = 0;
+    bool selecting_flag = 0;
+    while (!selecting_flag){
+        clear();
+        mvwprintw(stdscr, LINES - 1, 0, "Sex je %d", choice);
+        for (size_t i = 0; i < choices.size(); i++)
+        {
+            if (choice == i){
+                wattron(stdscr, COLOR_PAIR(1));
+                mvwprintw(stdscr, 1 + i, 0, "%s", choices[i].c_str());
+                wattroff(stdscr, COLOR_PAIR(1));
+            }
+            else
+                mvwprintw(stdscr, 1 + i, 0, "%s", choices[i].c_str());
+        }
+        INPUT = wgetch(stdscr);
+        switch (INPUT){
+        case 'w':
+            if (choice != 0){
+                choice--;
+            }
+            else choice = choices.size() - 1;
+            break;
+        case 's':
+            if (choice + 1 < choices.size()){
+                choice++;
+            }
+            else choice = 0;
+            break;
+        case KEY_ENTER:
+        case 'd':
+            NcurseEnd();
+            return choice;
+            break;
+        default:
+            break;
+       }
+    }
+    NcurseEnd();
+    std::cout << "Skill issue\n";
+    return 0;
+}
+bool CLI::CLDataAddDR(){
+    bool editing_flag = 1;
+    std::vector<std::string> selections = {"1. Add devices.", "2. Add interfaces/modes.","3. Add commands", "4. Exit"};
+    while (editing_flag)
+    {
+        switch (CurseChoice(selections))
+        {
+        case 0:
+            CurseChoice({"sex", "sex**2"});
+            break;
+        case 1:
+            
+            break;
+        case 2:
+            break;
+        case 3:
+            editing_flag = 0;
+            break;
+        default:
+            break;
+        }
+    }
     
+
+    return 0;
+}
+
+bool CLI::NcurseDataDR(){
     Resize();
     int INPUT;
-    while (INPUT = wgetch(stdscr), INPUT != 'q')
+    bool display_flag = 1;
+    while (INPUT = wgetch(stdscr))//, INPUT != 'q')
     {
         switch (INPUT)
         {
@@ -152,6 +233,13 @@ void CLI::START_RUNTIME(){
             this->DISPLAY_MODE = !this->DISPLAY_MODE;
             this->Resize();
             break;
+        case 'c':
+            NcurseEnd();
+            return 0;
+            break;
+        case 'q':
+            NcurseEnd();
+            return 1;
         case KEY_RESIZE:
             this->Resize();
             break;
@@ -160,7 +248,15 @@ void CLI::START_RUNTIME(){
         }
         INPUT = 0;
     }
-    endwin();
+    NcurseEnd();
+    return 1;
+}
+void CLI::START_RUNTIME(){
+    while (!NcurseDataDR()){
+        std::cout << "\033[2J\033[H"<< "\033[2J";
+        CLDataAddDR();
+    }
+    
     // this->device_atributes_ui->ConsoleLog();
     // this->device_mode_ui->ConsoleLog();
     // this->device_ui->ConsoleLog();

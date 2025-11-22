@@ -19,6 +19,19 @@
 class CLI
 {
 private:
+    /// @brief Makes a ncurse CLI for making a choice
+    /// @param choices The possible choices
+    /// @return returns the choice made
+    unsigned long int CurseChoice(std::vector<std::string> choices); 
+    /// @brief Handles adding anything via standard CL
+    bool CLDataAddDR();
+    /// @brief Handles ncurses data display runtime
+    /// @return Returns 1 for exit request and 0 for contiue just switch
+    bool NcurseDataDR();
+    /// @brief Initializes ncurses
+    void NcurseStart();
+    /// @brief ends ncurses
+    void NcurseEnd();
     /// @brief vector containing all the devices to display
     std::vector<NET_DEVICE> devices;
     /// @brief Pointer to the window containing the device list
