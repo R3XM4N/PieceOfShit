@@ -24,12 +24,9 @@ enum class INTERFACE_TYPE{
     INT_GIGABYTE,
     INT_FAST
 };
-/**
- * @brief Function for translating enum values for interfaces/modes into human readable text
- * 
- * @param int_type The type of inteface/mode of operation
- * @return std::string 
- */
+///@brief Function for translating enum values for interfaces/modes into human readable text
+///@param int_type The type of inteface/mode of operation
+///@return std::string 
 std::string interfaceTypeToString(INTERFACE_TYPE int_type);
 /// @brief Type of command used to distinguish commands
 enum class COMMAND_TYPE{
@@ -42,6 +39,9 @@ enum class COMMAND_TYPE{
     OSPF
 };
 
+/// @brief Converts enum command to string
+/// @param cmd Command to be translated
+std::string commandToString(COMMAND_TYPE cmd);
 /**
  * @brief Class representing a generic command structure to use as a parent do not use directly
  */

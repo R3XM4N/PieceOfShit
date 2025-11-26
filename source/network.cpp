@@ -64,6 +64,26 @@ std::vector<std::string> IP_C::ToString(){
     else return {"IP COMMAND WRONGLY INITIALIZED (TEXT)"};
     return {output.str()};
 }
+
+std::string commandToString(COMMAND_TYPE cmd){
+    switch (cmd)
+    {
+    case COMMAND_TYPE::DHCP:
+        return "Add DHCP";
+    case COMMAND_TYPE::IPv4:
+        return "IPv4";
+    case COMMAND_TYPE::IPv6:
+        return "IPv6";
+    case COMMAND_TYPE::OSPF:
+        return "OSPF";
+    case COMMAND_TYPE::VLAN_ACCESS:
+        return "VLAN Access";
+    case COMMAND_TYPE::VLAN_TRUNK:
+        return "VLAN Trunk";
+    default:
+        break;
+    }
+}
 #pragma endregion
 
 #pragma region DHCP
