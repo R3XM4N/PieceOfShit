@@ -237,6 +237,36 @@ bool CLI::CLDataAddDR(){
                             selections.push_back(intr.ToString());
                         }
                         unsigned long int interface = CurseChoice(selections);
+                        selections = {};
+                        for (unsigned short int i = 0; i < 5; i++){
+                            auto fillOptions = [&selections, &i](){
+                                switch (i)
+                                {
+                                case 0:
+                                    selections.push_back("Add DHCP");
+                                    return;
+                                case 1:
+                                    selections.push_back("Add IPv4");
+                                    return;
+                                case 2:
+                                    selections.push_back("Add IPv6");
+                                    return;
+                                case 3:
+                                    selections.push_back("Add OSPF");
+                                    return;
+                                case 4:
+                                    selections.push_back("Add VLAN Access");
+                                    return;
+                                case 5:
+                                    selections.push_back("Add VLAN Trunk");
+                                    return;
+                                default:
+                                    break;
+                                }
+                            };
+                            fillOptions();
+                        }
+                        CurseChoice(selections);                
                     }
                 }
                 break;

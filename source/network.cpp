@@ -38,6 +38,7 @@ std::string interfaceTypeToString(INTERFACE_TYPE int_type){
         return "(ERROR)#";
         break;
     }
+    return "0";
 }
 
 #pragma region IP COMMAND
